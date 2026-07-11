@@ -3,7 +3,6 @@ import { SYSTEM_PROMPT } from "@/lib/systemPrompt";
 import { AIProvider, ModelResponse } from "@/types/global.types";
 import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod.js";
-import {z} from 'zod'; 
 
 export class AnthropicProvider implements AIProvider {
     private readonly modelName: string; 
@@ -34,10 +33,8 @@ export class AnthropicProvider implements AIProvider {
         })
 
         const duration = performance.now() - start; 
-        console.log(response.parsed_output)
         if(response.parsed_output === null) return null; 
-        
-
+    
         return {
             provider: "Anthropic",
             model: this.modelName, 

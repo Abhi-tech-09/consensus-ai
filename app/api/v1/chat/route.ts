@@ -1,10 +1,12 @@
 import { AnthropicProvider } from "@/providers/anthropic";
+import { GeminiProvider } from "@/providers/gemini";
 import { OpenAIProvider } from "@/providers/openai";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   const openaiProvider = new OpenAIProvider("gpt-5-mini");
   const anthropicProvider = new AnthropicProvider("claude-sonnet-5");
+  const geminiProvider = new GeminiProvider("gemini-3.5-flash");
   try {
     const { prompt } = await request.json();
     console.log(prompt); 
@@ -16,7 +18,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await anthropicProvider.generate(prompt); 
+    const result = await geminiProvider.generate(prompt); 
     return NextResponse.json({
         data: result
     },{
