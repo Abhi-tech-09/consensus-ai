@@ -1,64 +1,76 @@
-import Image from "next/image";
+'use client'
+import ConsensusCard from "@/components/ConsensusCard";
+import Hero from "@/components/Hero";
+import Navbar from "@/components/Navbar";
+import ProgressSection from "@/components/ProgressSection";
+import ProgressSectionExpected from "@/components/ProgressSectionExpected";
+import PromptInput from "@/components/PromptInput";
+import ResponseCards from "@/components/ResponseCards";
+import axios from "axios";
+import { useEffect, useState } from "react";
+
+
+export type ModelStatus = 'idle' | 'loading' | 'done' | 'error'
+
+export interface ModelResult {
+  status: ModelStatus
+  text: string
+}
+
+export interface Results {
+  openai: ModelResult
+  claude: ModelResult
+  gemini: ModelResult
+  consensus: ModelResult
+}
+
+const IDLE: ModelResult = { status: 'idle', text: '' }
+
+export const MOCK_RESPONSES = {
+  openai: `Based on the provided prompt, I can offer a comprehensive analysis. The core concept revolves around distributed intelligence — where multiple AI systems collaborate to surface a more robust and nuanced answer than any single model could produce alone.\n\nThis approach mirrors how expert committees function in high-stakes decision-making: each voice brings a distinct training distribution, architectural bias, and reasoning style. The synthesis of these perspectives reduces the risk of confident-but-wrong outputs.\n\nKey considerations include latency trade-offs, cost multipliers, and the challenge of detecting meaningful divergence versus superficial phrasing differences across model outputs.`,
+  claude: `The question touches on a genuinely interesting challenge in applied AI: how do we combine outputs from models with fundamentally different architectures, training data, and alignment approaches?\n\nWhat I find compelling here is the meta-level problem — not just "what do the models say" but "how do we weight their responses?" A simple majority vote fails when one model is systematically better on a given domain. A weighted ensemble requires calibration data that may not exist.\n\nThe most honest synthesis acknowledges uncertainty explicitly: where models agree, confidence is higher; where they diverge, the disagreement itself is signal worth surfacing to the user rather than papering over.`,
+  gemini: `This is a fascinating application of ensemble methods to large language models. From a systems perspective, the AI Consensus Engine architecture raises several important design questions.\n\nFirst, temporal coherence: models should ideally run in parallel, but their responses need to be reconciled without one model's output influencing another's (to avoid echo chambers). Second, domain-awareness: the synthesis layer should ideally know which model has stronger priors for a given topic category.\n\nThird — and most underexplored — is graceful disagreement. When models give genuinely different answers, the most valuable output may be a structured representation of that disagreement, not a forced consensus that loses the signal.`,
+  consensus: `## Consensus Analysis\n\nAll three models converge on a central theme: **ensemble AI systems are valuable precisely because of their divergence**, not despite it.\n\n**Points of strong agreement:**\n- Parallel execution is preferable to sequential to avoid anchoring effects\n- Disagreement between models is meaningful signal, not noise to suppress\n- A weighted synthesis outperforms naive averaging when domain priors are known\n\n**Nuanced differences:**\nOpenAI emphasizes practical trade-offs (latency, cost). Claude focuses on the epistemics of weighting and calibration. Gemini brings a systems-design lens to the architecture.\n\n**Synthesized recommendation:**\nBuild the consensus layer to (1) run models in parallel, (2) surface disagreement to users with confidence indicators, and (3) apply domain-aware weighting when training signal is available. The goal is augmented judgment, not artificial certainty.`,
+}
 
 export default function Home() {
+  const [dark, setDark] = useState(false);
+  const [prompt, setPrompt] = useState('')
+  const [generating, setGenerating] = useState(false)
+  const [results, setResults] = useState<Results>({
+    openai: IDLE,
+    claude: IDLE,
+    gemini: IDLE,
+    consensus: IDLE,
+  })
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', dark)
+  }, [dark])
+
+  const handleOnGenerate = async (prompt: string) => {
+    const res = await axios.post("api/v1/chat",{
+      prompt
+    }); 
+    console.log(res.data)
+  } 
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-200">
+      <Navbar dark={dark} onToggleDark={() => setDark(d => !d)} />
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 pb-24 ">
+        {prompt === '' ? <Hero /> : <ConsensusCard result={{ status: 'done', text: "hey" }} />}
+        <PromptInput
+          prompt={prompt}
+          onChange={setPrompt}
+          onGenerate={handleOnGenerate}
+          generating={generating}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+        <ProgressSection />
+        <ResponseCards />
+
+
+
       </main>
     </div>
   );
