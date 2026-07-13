@@ -1,84 +1,48 @@
-import { AIAnswerSchema } from "@/lib/constants";
-import { SYSTEM_PROMPT } from "@/lib/systemPrompt";
-import { AIProvider, ModelResponse } from "@/types/global.types";
-import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod.js";
+import { AIAnswerSchema, PROVIDERS } from "@/lib/constants";
+import { ModelResponse } from "@/types/global.types";
 import { GoogleGenAI, Type } from "@google/genai";
-import { format } from "path";
-import { text } from "stream/consumers";
-import { zodToJsonSchema } from "zod-to-json-schema";
+import { AIProvider } from "./provider";
+import { ZodType } from "zod";
 
+export class GeminiProvider<T> extends AIProvider {
+  private readonly client: GoogleGenAI;
 
-export class GeminiProvider implements AIProvider {
-    private readonly modelName: string;
-    private readonly client: GoogleGenAI;
+  constructor(providerName: PROVIDERS, modelName: string) {
+    super(providerName, modelName);
+    this.client = new GoogleGenAI({
+      apiKey: process.env.GEMINI_API_KEY,
+    });
+  }
 
-    constructor(modelName: string) {
-        this.client = new GoogleGenAI({
-          apiKey: process.env.GEMINI_API_KEY,
-        });
-        this.modelName = modelName
+  setSchema(schema: Object) {
+    this.responseSchema = {
+      responseSchema: schema
     }
-    
-    async generate(prompt: string): Promise<ModelResponse | null> {
-        const start = performance.now();
-        const response = await this.client.models.generateContent({
-          model: this.modelName,
-          contents: prompt,
-          config: {
-            systemInstruction: SYSTEM_PROMPT,
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: Type.OBJECT,
-              properties: {
-                answer: {
-                  type: Type.STRING,
-                },
-                keyPoints: {
-                  type: Type.ARRAY,
-                  items: {
-                    type: Type.STRING,
-                  },
-                },
-                assumptions: {
-                  type: Type.ARRAY,
-                  items: {
-                    type: Type.STRING,
-                  },
-                },
-                limitations: {
-                  type: Type.ARRAY,
-                  items: {
-                    type: Type.STRING,
-                  },
-                },
-                confidence: {
-                  type: Type.STRING,
-                  enum: ["HIGH", "MEDIUM", "LOW"],
-                },
-              },
-              required: [
-                "answer",
-                "keyPoints",
-                "assumptions",
-                "limitations",
-                "confidence",
-              ],
-            },
-          },
-        });
-        
-        const duration = performance.now() - start; 
-        console.log(response.text)
-        const parsedResponse = AIAnswerSchema.parse(
-            JSON.parse(response.text ?? "{}")
-        ); 
+  }
 
-        return {
-            provider: 'Gemini', 
-            model: this.modelName, 
-            response: parsedResponse, 
-            duration
-        }
-    }
-        
+  async generate<T>(prompt: string): Promise<ModelResponse<T>> {
+    const start = performance.now();
+    const response = await this.client.models.generateContent({
+      model: this.modelName,
+      contents: prompt,
+      config: {
+        systemInstruction: this.systemPrompt ?? "",
+        responseMimeType: "application/json",
+        ...this.responseSchema,
+      },
+    });
+
+    const duration = performance.now() - start;
+    console.log(response.text);
+    const parsedResponse = AIAnswerSchema.parse(
+      JSON.parse(response.text ?? "{}"),
+    );
+
+    return {
+      provider: this.providerName,
+      model: this.modelName,
+      response: parsedResponse as T,
+      duration,
+    };
+  }
 }

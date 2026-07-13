@@ -1,18 +1,19 @@
+import { Orchestrator } from "@/lib/orchestrator";
 import { AnthropicProvider } from "@/providers/anthropic";
 import { GeminiProvider } from "@/providers/gemini";
 import { GroqProvider } from "@/providers/groq";
 import { OpenAIProvider } from "@/providers/openai";
 import { NextRequest, NextResponse } from "next/server";
 
+
+const orchestrator = new Orchestrator(); 
+
 export async function POST(request: NextRequest) {
-  const openaiProvider = new OpenAIProvider("gpt-5-mini");
-  const anthropicProvider = new AnthropicProvider("claude-sonnet-5");
-  const geminiProvider = new GeminiProvider("gemini-3.5-flash");
-  const groqProvider = new GroqProvider("grok-4.3");
   try {
     const { prompt } = await request.json();
     console.log(prompt); 
-
+    orchestrator.setUserPrompt(prompt); 
+    
     if (!prompt) {
       return NextResponse.json(
         { message: "Prompt is required." },
@@ -20,7 +21,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await groqProvider.generate(prompt); 
+    const result = await orchestrator.generateResponse(); 
     return NextResponse.json({
         data: result
     },{

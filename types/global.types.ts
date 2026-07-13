@@ -1,15 +1,32 @@
-import { AIAnswerSchema } from '@/lib/constants'
+import { AIAnswerSchema, JudgeAnswerSchema, PROVIDERS } from '@/lib/constants'
 import {z} from 'zod'
+import {AIProvider} from '@/providers/provider'
 
 export type AIAnswer = z.infer<typeof AIAnswerSchema>; 
 
-export type ModelResponse = {
-    provider: string, 
+export type ModelResponse<T> = {
+    provider: PROVIDERS, 
     model: string, 
-    response: AIAnswer, 
+    response: T, 
     duration: number
 }
 
-export interface AIProvider {
-    generate(prompt: string): Promise<ModelResponse | null>
+// export type OrchestratorResponse = {
+//     provider: PROVIDERS,
+//     response: ModelResponse[],
+//     finalResponse: JudgeAnswer,
+//     duration: number
+// }
+
+export type JudgeAnswer = z.infer<typeof JudgeAnswerSchema>;
+
+export type ConsensusProviderType = {
+    name: PROVIDERS,
+    model: string
+    getProvider:() => AIProvider
+}
+
+export type ConsensusConfigType = {
+    providers: ConsensusProviderType[],
+    judgeProvider: ConsensusProviderType
 }

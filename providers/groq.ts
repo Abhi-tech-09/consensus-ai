@@ -1,40 +1,46 @@
-import { AIProvider, ModelResponse } from "@/types/global.types";
+import { ModelResponse } from "@/types/global.types";
 import Groq from "groq-sdk";
-import { SYSTEM_PROMPT } from "@/lib/systemPrompt";
-import { AIAnswerSchema } from "@/lib/constants";
-export class GroqProvider implements AIProvider {
-  private readonly modelName: string;
+import { AIAnswerSchema, PROVIDERS } from "@/lib/constants";
+import { AIProvider } from "./provider";
+import { ZodType } from "zod";
+export class GroqProvider<T> extends AIProvider {
   private readonly client: Groq;
 
-  constructor(modelName: string) {
-    this.modelName = modelName;
+  constructor(providerName: PROVIDERS, modelName: string) {
+    super(providerName, modelName);
     this.client = new Groq({
       apiKey: process.env.GROQ_API_KEY,
     });
   }
 
-  async generate(prompt: string): Promise<ModelResponse | null> {
+  setSchema(schema: Object) {
+    this.responseSchema = {
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "AIAnswerSchema",
+          strict: true,
+          schema: schema,
+        },
+      },
+    };
+  }
+
+  async generate<T>(prompt: string): Promise<ModelResponse<T>> {
     const start = performance.now();
     const response = await this.client.chat.completions.create({
       model: "openai/gpt-oss-20b",
       messages: [
         {
           role: "system",
-          content: SYSTEM_PROMPT + " " + EXTRA_RULE,
+          content: this.systemPrompt ?? "",
         },
         {
           role: "user",
           content: prompt,
         },
       ],
-      response_format: {
-        type: "json_schema",
-        json_schema: {
-          name: "AIAnswerSchema",
-          strict: true,
-          schema: AIAnswerSchemaGroq,
-        },
-      },
+      ...this.responseSchema,
     });
 
     const duration = performance.now() - start;
@@ -43,46 +49,13 @@ export class GroqProvider implements AIProvider {
     );
 
     return {
-      provider: "Groq",
+      provider: this.providerName,
       model: this.modelName,
-      response: result,
+      response: result as T,
       duration,
     };
   }
 }
-
-const AIAnswerSchemaGroq = {
-  type: "object",
-  properties: {
-    answer: {
-      type: "string",
-    },
-    keyPoints: {
-      type: "array",
-      items: {
-        type: "string",
-      },
-    },
-    assumptions: {
-      type: "array",
-      items: {
-        type: "string",
-      },
-    },
-    limitations: {
-      type: "array",
-      items: {
-        type: "string",
-      },
-    },
-    confidence: {
-      type: "string",
-      enum: ["HIGH", "MEDIUM", "LOW"],
-    },
-  },
-  required: ["answer", "keyPoints", "assumptions", "limitations", "confidence"],
-  additionalProperties: false,
-} as const;
 
 const EXTRA_RULE = `
 Your response must satisfy the provided JSON schema.
