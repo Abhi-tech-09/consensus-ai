@@ -30,4 +30,8 @@ const StepSection = ({ step }: { step: string }) => {
   )
 }
 
+const EvaluationSection = () => {
+  
+}
+
 export default ProgressSection

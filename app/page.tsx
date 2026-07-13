@@ -1,6 +1,7 @@
 'use client'
 import ConsensusCard from "@/components/ConsensusCard";
 import Hero from "@/components/Hero";
+import { ModelEvaluation, ModelEvaluationCard } from "@/components/ModelEvaluationCard";
 import Navbar from "@/components/Navbar";
 import ProgressSection from "@/components/ProgressSection";
 import ProgressSectionExpected from "@/components/ProgressSectionExpected";
@@ -8,6 +9,7 @@ import PromptInput from "@/components/PromptInput";
 import ResponseCards from "@/components/ResponseCards";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { mock } from "@/components/ConsensusCard";
 
 
 type ModelStatus = "idle" | "loading" | "done" | "error";
@@ -70,8 +72,7 @@ export default function Home() {
         />
         <ProgressSection />
         <ResponseCards />
-
-
+        <ModelEvaluationCard data={mock.data.response.evaluations[0] as ModelEvaluation} />
 
       </main>
     </div>

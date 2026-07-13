@@ -16,8 +16,8 @@ export const CONSENSUS_CONFIG: ConsensusConfigType = {
     },
     {
       name: PROVIDERS.Anthropic,
-      model: "claude-sonnet-5",
-      getProvider(){
+      model: "claude-haiku-4-5-20251001",
+      getProvider() {
         return new AnthropicProvider(this.name, this.model);
       },
     },
@@ -41,7 +41,7 @@ export const CONSENSUS_CONFIG: ConsensusConfigType = {
     name: PROVIDERS.Anthropic,
     model: "claude-sonnet-5",
     getProvider() {
-      return new AnthropicProvider(this.name, this.model)
+      return new AnthropicProvider(this.name, this.model);
     }
   },
 };
