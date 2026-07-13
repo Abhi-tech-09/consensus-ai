@@ -10,7 +10,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 
-export type ModelStatus = 'idle' | 'loading' | 'done' | 'error'
+type ModelStatus = "idle" | "loading" | "done" | "error";
 
 export interface ModelResult {
   status: ModelStatus
@@ -43,6 +43,7 @@ export default function Home() {
     gemini: IDLE,
     consensus: IDLE,
   })
+  const [ans, setAns] = useState("");
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', dark)
@@ -53,13 +54,14 @@ export default function Home() {
       prompt
     }); 
     console.log(res.data)
+    setAns(res.data); 
   } 
 
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-200">
       <Navbar dark={dark} onToggleDark={() => setDark(d => !d)} />
       <main className="max-w-5xl mx-auto px-4 sm:px-6 pb-24 ">
-        {prompt === '' ? <Hero /> : <ConsensusCard result={{ status: 'done', text: "hey" }} />}
+        {prompt === '' ? <Hero /> : <ConsensusCard result={{ status: 'done', text: ans }} />}
         <PromptInput
           prompt={prompt}
           onChange={setPrompt}

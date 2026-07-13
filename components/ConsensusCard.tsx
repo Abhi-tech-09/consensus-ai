@@ -37,7 +37,7 @@ export default function ConsensusCard({ result }: ConsensusCardProps) {
             </div>
 
             {/* Body */}
-            <div className="px-6 py-5">
+            <div className="px-6 py-5 overflow-y-scroll h-64 text-xs">
                 {result.status === 'loading' && (
                     <div className="space-y-3 animate-pulse">
                         {[100, 88, 94, 76, 90, 82, 60].map((w, i) => (
@@ -50,7 +50,7 @@ export default function ConsensusCard({ result }: ConsensusCardProps) {
                     </div>
                 )}
                 {result.status === 'done' && (
-                    <ConsensusContent text={result.text} />
+                    JSON.stringify(result.text, null, 4)
                 )}
             </div>
 

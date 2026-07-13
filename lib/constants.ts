@@ -24,15 +24,15 @@ export const EvaluationSchema = z.object({
 
 export const JudgeAnswerSchema = z.object({
   summary: z.string(),
-  evaluations: EvaluationSchema,
+  evaluations: z.array(EvaluationSchema),
   diagreements: z.array(z.string()),
 });
 
 export enum PROVIDERS {
-  OpenAI,
-  Anthropic,
-  Gemini,
-  Groq,
+  OpenAI = "OpenAI",
+  Anthropic = "Anthropic",
+  Gemini = "Gemini",
+  Groq = "Groq"
 }
 
 export const AIAnswerSchemaGroq = {

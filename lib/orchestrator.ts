@@ -5,9 +5,8 @@ import { AIProvider } from "@/providers/provider";
 import { getJudgeSchema, getProviderSchema } from "./schema-factory";
 
 export class Orchestrator {
-    private userPrompt: string = ''; 
-    private readonly providers: AIProvider[];
-    private readonly judgeProvider: AIProvider;
+    readonly providers: AIProvider[];
+    readonly judgeProvider: AIProvider;
 
     constructor() {
         this.providers = CONSENSUS_CONFIG.providers.map(p => p.getProvider()); 
@@ -25,13 +24,9 @@ export class Orchestrator {
 
     }
 
-    setUserPrompt(userPrompt: string) {
-        this.userPrompt = userPrompt; 
-    }
-
-    async executeProviders(): Promise<ModelResponse<AIAnswer>[]|null> {
+    async executeProviders(userPrompt: string): Promise<ModelResponse<AIAnswer>[]> {
         const responses =  await Promise.allSettled(
-            this.providers.map(provider => provider.generate<AIAnswer>(this.userPrompt))
+            this.providers.map(provider => provider.getResponse<AIAnswer>(userPrompt))
         );
         return responses
           .filter(
@@ -41,15 +36,44 @@ export class Orchestrator {
           .map((result) => result.value);
     }
 
-    buildJudgePrompt(modelResponses: ModelResponse<AIAnswer>[]): string {
-        return ""
+    buildJudgePrompt(modelResponses: ModelResponse<AIAnswer>[], userPrompt: string): string {
+        const formattedResponse = modelResponses.map((response, index) => {
+            return `
+            ==============================================================
+                Model ${index+1}
+
+                Provider: ${response.provider}
+                Model: ${response.model}
+
+                Response: ${JSON.stringify(response.response, null, 2)}
+        `
+        }).join("\n"); 
+
+        return `
+            Original Prompt: ${userPrompt}
+
+            ${formattedResponse}
+            ==============================
+
+            Evaluate all responses according to the system instructions.
+
+            Generate:
+            - A synthesized summary.
+            - An evaluation of each model.
+            - Consensus points.
+            - Disagreements.
+            - An overall confidence score.
+
+            Return ONLY valid JSON.
+        `;
     }
 
-    async generateResponse(): Promise<JudgeAnswer|null> {
+    async generateResponse(userPrompt: string) {
         // main judge provider call
-        const response = await this.executeProviders(); 
-        console.log(response);  
-        throw new Error(); 
+        const modelResponses = await this.executeProviders(userPrompt); 
+        const judgePrompt = this.buildJudgePrompt(modelResponses, userPrompt);
+        const judgeResponse = await this.judgeProvider.getResponse<JudgeAnswer>(judgePrompt);
+        return judgeResponse; 
     }
 
 }

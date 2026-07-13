@@ -12,7 +12,6 @@ export async function POST(request: NextRequest) {
   try {
     const { prompt } = await request.json();
     console.log(prompt); 
-    orchestrator.setUserPrompt(prompt); 
     
     if (!prompt) {
       return NextResponse.json(
@@ -21,7 +20,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await orchestrator.generateResponse(); 
+    const result = await orchestrator.generateResponse(prompt); 
     return NextResponse.json({
         data: result
     },{

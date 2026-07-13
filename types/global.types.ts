@@ -18,6 +18,8 @@ export type ModelResponse<T> = {
 //     duration: number
 // }
 
+export type ModelStatus = "idle" | "loading" | "done" | "error";
+
 export type JudgeAnswer = z.infer<typeof JudgeAnswerSchema>;
 
 export type ConsensusProviderType = {
