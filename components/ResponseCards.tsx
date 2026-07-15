@@ -1,33 +1,36 @@
-import { MOCK_RESPONSES } from "@/app/page"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
 import { mock } from "./ConsensusCard"
 import { Check, Plus, Sparkles, X } from "lucide-react"
-import { CONSENSUS_CONFIG } from "@/config/consensus-config"
-import { ConsensusProviderType } from "@/types/global.types"
+import { CONSENSUS_CONFIG, PROVIDER_COLOR } from "@/config/consensus-config"
+import { ConsensusProviderType, EvaluationType } from "@/types/global.types"
 
-const ResponseCards = () => {
+const ResponseCards = ({ evaluations }: { evaluations: EvaluationType[] }) => {
   return (
     <div className="grid sm:grid-cols-4 grid-cols-1 gap-2 w-6xl mx-auto">
       {
-        CONSENSUS_CONFIG.providers.map((model, index) => {
-          return <ModelCard key={model.name} model={model} data={mock.data.response.evaluations[index]} />
+        evaluations.map((evaluation, index) => {
+          return <ModelCard key={evaluation.provider} evaluation={evaluation} />
         })
       }
     </div>
   )
 }
 
-const ModelCard = ({ model, data }: { model: ConsensusProviderType, data: any }) => {
+const getModelNameForProvider = (x: string) => {
+  return CONSENSUS_CONFIG.providers.find(p => p.name === x)?.model;
+}
+
+const ModelCard = ({ evaluation }: { evaluation: EvaluationType }) => {
   return (
-    <Card className="p-0 overflow-hidden border-t-2" style={{ borderTopColor: model.color }}>
-      <CardHeader className="px-4 py-2" style={{ backgroundColor: `${model.color}15` }}>
+    <Card className="p-0 overflow-hidden border-t-2" style={{ borderTopColor: PROVIDER_COLOR[evaluation.provider] }}>
+      <CardHeader className="px-4 py-2" style={{ backgroundColor: `${PROVIDER_COLOR[evaluation.provider]}15` }}>
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-semibold" style={{ color: model.color }}>{model.name}</p>
-            <p className="text-[10px] text-muted-foreground truncate max-w-25">{model.model}</p>
+            <p className="text-sm font-semibold" style={{ color: PROVIDER_COLOR[evaluation.provider] }}>{evaluation.provider}</p>
+            <p className="text-[10px] text-muted-foreground truncate max-w-25">{getModelNameForProvider(evaluation.provider)}</p>
           </div>
           <div className="text-right">
-            <p className="text-base font-bold">8.7</p>
+            <p className="text-base font-bold">{evaluation.score}</p>
             <p className="text-[10px] text-muted-foreground uppercase tracking-wider">score</p>
           </div>
         </div>
@@ -41,15 +44,15 @@ const ModelCard = ({ model, data }: { model: ConsensusProviderType, data: any })
             </span>
           </div>
           <div className="flex flex-col gap-3">
-            <CriteriaBar label="Accuracy" value={4} />
-            <CriteriaBar label="Clarity" value={5} />
-            <CriteriaBar label="Completeness" value={7} />
+            <CriteriaBar label="Accuracy" value={evaluation.evaluation.accuracy} />
+            <CriteriaBar label="Clarity" value={evaluation.evaluation.clarity} />
+            <CriteriaBar label="Completeness" value={evaluation.evaluation.completeness} />
           </div>
         </div>
         <div className="flex flex-col gap-5">
-          <Section title="Strengths" items={data?.strengths} tone="positive" icon={<Check className="h-2.5 w-2.5" />} />
-          <Section title="Weaknesses" items={data?.weaknesses} tone="negative" icon={<X className="h-2.5 w-2.5" />} />
-          <Section title="Contribution" items={data?.contribution} tone="neutral" icon={<Plus className="h-2.5 w-2.5" />} />
+          <Section title="Strengths" items={evaluation.strengths} tone="positive" icon={<Check className="h-2.5 w-2.5" />} />
+          <Section title="Weaknesses" items={evaluation.weaknesses} tone="negative" icon={<X className="h-2.5 w-2.5" />} />
+          <Section title="Contribution" items={evaluation.contribution} tone="neutral" icon={<Plus className="h-2.5 w-2.5" />} />
         </div>
       </CardContent>
     </Card>

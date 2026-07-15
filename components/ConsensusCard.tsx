@@ -54,13 +54,13 @@ export default function ConsensusCard({ result }: ConsensusCardProps) {
                     </div>
                 )}
                 {result.status === 'done' && (
-                    mock.data.response.summary
+                    result.text
                 )}
             </div>
 
             {/* Footer badges */}
             {result.status === 'done' && (
-                <div className="px-6 pb-5 flex flex-wrap gap-2">
+                <div className="px-6 py-5 flex flex-wrap gap-2">
                     {['OpenAI', 'Claude', 'Gemini', 'Grok'].map(m => (
                         <span
                             key={m}

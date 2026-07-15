@@ -13,7 +13,7 @@ export default function PromptInput({ prompt, onChange, onGenerate, generating }
                 onChange={e => onChange(e.target.value)}
                 placeholder="Ask anything — the three models will respond independently and their answers will be synthesized..."
                 rows={2}
-                className="w-full px-5 py-1 text-sm text-foreground placeholder:text-muted-foreground bg-transparent resize-none outline-none font-(family-name:--font-sans) leading-relaxed"
+                className="w-full p-5 text-sm text-foreground placeholder:text-muted-foreground bg-transparent resize-none outline-none font-(family-name:--font-sans) leading-relaxed"
                 onKeyDown={e => {
                     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') onGenerate(prompt)
                 }}

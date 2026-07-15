@@ -5,6 +5,13 @@ import { GroqProvider } from "@/providers/groq";
 import { OpenAIProvider } from "@/providers/openai";
 import { ConsensusConfigType } from "@/types/global.types";
 
+export const PROVIDER_COLOR = {
+  [PROVIDERS.OpenAI.toString()]: "#10a37f",
+  [PROVIDERS.Anthropic.toString()]: "#D97757",
+  [PROVIDERS.Gemini.toString()]: "#4285f4",
+  [PROVIDERS.Groq.toString()]: "#f55036",
+};
+
 export const CONSENSUS_CONFIG: ConsensusConfigType = {
   providers: [
     {

@@ -1,4 +1,9 @@
-import { AIAnswerSchema, JudgeAnswerSchema, PROVIDERS } from "@/lib/constants";
+import {
+  AIAnswerSchema,
+  EvaluationSchema,
+  JudgeAnswerSchema,
+  PROVIDERS,
+} from "@/lib/constants";
 import { z } from "zod";
 import { AIProvider } from "@/providers/provider";
 
@@ -19,6 +24,8 @@ export type ModelResponse<T> = {
 // }
 
 export type ModelStatus = "idle" | "loading" | "done" | "error";
+
+export type EvaluationType = z.infer<typeof EvaluationSchema>;
 
 export type JudgeAnswer = z.infer<typeof JudgeAnswerSchema>;
 

@@ -5,14 +5,13 @@ import { GroqProvider } from "@/providers/groq";
 import { OpenAIProvider } from "@/providers/openai";
 import { NextRequest, NextResponse } from "next/server";
 
-
-const orchestrator = new Orchestrator(); 
+const orchestrator = new Orchestrator();
 
 export async function POST(request: NextRequest) {
   try {
     const { prompt } = await request.json();
-    console.log(prompt); 
-    
+    console.log(prompt);
+
     if (!prompt) {
       return NextResponse.json(
         { message: "Prompt is required." },
@@ -20,16 +19,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await orchestrator.generateResponse(prompt); 
-    return NextResponse.json({
-        data: result
-    },{
-        status: 200
-    })
+    const result = await orchestrator.generateResponse(prompt);
+    return NextResponse.json(
+      {
+        ...result,
+      },
+      {
+        status: 200,
+      },
+    );
   } catch (error) {
     console.log(error);
-    NextResponse.json({
-      message: error
-    }, {status: 500})
+    NextResponse.json(
+      {
+        message: error,
+      },
+      { status: 500 },
+    );
   }
 }
