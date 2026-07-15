@@ -10,6 +10,7 @@ export const CONSENSUS_CONFIG: ConsensusConfigType = {
     {
       name: PROVIDERS.OpenAI,
       model: "gpt-5-mini",
+      color: "#10a37f",
       getProvider() {
         return new OpenAIProvider(this.name, this.model);
       },
@@ -17,6 +18,7 @@ export const CONSENSUS_CONFIG: ConsensusConfigType = {
     {
       name: PROVIDERS.Anthropic,
       model: "claude-haiku-4-5-20251001",
+      color: "#D97757",
       getProvider() {
         return new AnthropicProvider(this.name, this.model);
       },
@@ -24,6 +26,7 @@ export const CONSENSUS_CONFIG: ConsensusConfigType = {
     {
       name: PROVIDERS.Gemini,
       model: "gemini-3.5-flash",
+      color: "#4285f4",
       getProvider() {
         return new GeminiProvider(this.name, this.model);
       },
@@ -31,6 +34,7 @@ export const CONSENSUS_CONFIG: ConsensusConfigType = {
     {
       name: PROVIDERS.Groq,
       model: "qwen/qwen3.6-27b",
+      color: "#f55036",
       getProvider() {
         return new GroqProvider(this.name, this.model);
       },
@@ -40,8 +44,9 @@ export const CONSENSUS_CONFIG: ConsensusConfigType = {
   judgeProvider: {
     name: PROVIDERS.Anthropic,
     model: "claude-sonnet-5",
+    color: "#D97757",
     getProvider() {
       return new AnthropicProvider(this.name, this.model);
-    }
+    },
   },
 };

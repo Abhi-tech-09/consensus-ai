@@ -52,17 +52,17 @@ export default function Home() {
   }, [dark])
 
   const handleOnGenerate = async (prompt: string) => {
-    const res = await axios.post("api/v1/chat",{
+    const res = await axios.post("api/v1/chat", {
       prompt
-    }); 
+    });
     console.log(res.data)
-    setAns(res.data); 
-  } 
+    setAns(res.data);
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-200">
       <Navbar dark={dark} onToggleDark={() => setDark(d => !d)} />
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 pb-24 ">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 pb-24 ">
         {prompt === '' ? <Hero /> : <ConsensusCard result={{ status: 'done', text: ans }} />}
         <PromptInput
           prompt={prompt}
@@ -72,7 +72,6 @@ export default function Home() {
         />
         <ProgressSection />
         <ResponseCards />
-        <ModelEvaluationCard data={mock.data.response.evaluations[0] as ModelEvaluation} />
 
       </main>
     </div>
