@@ -17,28 +17,29 @@ export class OpenAIProvider extends AIProvider {
 
   setSchema(schema: ZodType) {
     this.responseSchema = {
-        text: {
-            format: zodTextFormat(schema, "AIschema"),
-        }
-    }
+      text: {
+        format: zodTextFormat(schema, "AIschema"),
+      },
+    };
   }
 
   async generate<T>(prompt: string): Promise<ModelResponse<T>> {
     const start = performance.now();
+    this.appendSystemPrompt(EXTRA_RULE);
 
     const response = await this.client.responses.create({
       model: this.modelName,
       input: [
         {
           role: "system",
-          content: this.systemPrompt ?? "",
+          content: this.getSystemPrompt() ?? "",
         },
         {
           role: "user",
           content: prompt,
         },
       ],
-      ...this.getResponseSchema()
+      ...this.getResponseSchema(),
     });
     // console.log("Your ai response", response.output_text)
     const duration = performance.now() - start;
@@ -54,3 +55,14 @@ export class OpenAIProvider extends AIProvider {
     };
   }
 }
+
+const EXTRA_RULE = `Additional Instructions:
+
+Approach the problem from a technical perspective.
+
+- Explain the underlying mechanisms and reasoning.
+- Use precise terminology where appropriate.
+- Discuss assumptions, limitations, and trade-offs.
+- Prefer depth over simplicity.
+- Avoid unnecessary storytelling or analogies.
+`;

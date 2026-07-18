@@ -25,10 +25,11 @@ export class AnthropicProvider<T> extends AIProvider {
 
   async generate<T>(prompt: string): Promise<ModelResponse<T> | null> {
     const start = performance.now();
+    this.appendSystemPrompt(EXTRA_RULE);
     const response = await this.client.messages.parse({
       model: this.modelName,
-      max_tokens: 2048,
-      system: this.systemPrompt ?? "",
+      max_tokens: 5000,
+      system: this.getSystemPrompt() ?? "",
       messages: [
         {
           role: "user",
@@ -49,3 +50,15 @@ export class AnthropicProvider<T> extends AIProvider {
     };
   }
 }
+
+const EXTRA_RULE = `
+Additional Instructions:
+
+Approach the problem creatively while remaining factually accurate.
+
+- Present ideas in an engaging way.
+- Use memorable explanations.
+- Make the response enjoyable to read.
+- Rephrase concepts naturally instead of sounding textbook-like.
+- Never invent facts for the sake of creativity.
+`;

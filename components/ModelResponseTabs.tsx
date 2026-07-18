@@ -3,15 +3,18 @@ import { AIAnswer, JudgeAnswer, ModelResponse } from '@/types/global.types'
 import React, { useEffect, useState } from 'react'
 import { AnswerCard } from './AnswerCard';
 import ResponseCards from './ResponseCards';
+import { Loader } from 'lucide-react';
 
 const ModelResponseTabs = ({
     modelResponses,
     judgeResponse,
+    loadingStatus,
     showEvaluations = false,
 }
     : {
         modelResponses: ModelResponse<AIAnswer>[],
         judgeResponse: ModelResponse<JudgeAnswer> | null,
+        loadingStatus: 'model-loading' | 'judge-loading' | 'done' | 'idle',
         showEvaluations?: boolean
     }) => {
     const [activeTab, setActiveTab] = useState<'answers' | 'evaluations'>('answers');
@@ -22,6 +25,7 @@ const ModelResponseTabs = ({
 
     useEffect(() => {
         if (showEvaluations) setActiveTab('evaluations');
+        else setActiveTab('answers');
     }, [showEvaluations])
 
     return (
@@ -33,9 +37,14 @@ const ModelResponseTabs = ({
                     className={`px-4 py-3 font-mono text-sm font-medium uppercase tracking-wider transition-all duration-200 relative group ${activeTab === 'answers'
                         ? 'border-b-2 border-foreground text-foreground'
                         : 'text-muted-foreground hover:text-foreground'
-                        } cursor-pointer`}
+                        } cursor-pointer flex items-center justify-between gap-2`}
                 >
-                    Model Answers
+                    <span>Model Answers</span>
+                    {
+                        loadingStatus === 'model-loading' && (
+                            <span><Loader className="h-5 w-5 animate-spin" /></span>
+                        )
+                    }
                     {activeTab === 'answers' && (
                         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-linear-to-r from-primary via-primary to-transparent animate-slide-in-left" />
                     )}
@@ -54,6 +63,11 @@ const ModelResponseTabs = ({
                         )}
                     </button>
                 )}
+                {
+                    loadingStatus === 'judge-loading' && (
+                        <span className='px-5'><Loader className="h-5 w-5 animate-spin" /></span>
+                    )
+                }
             </div>
 
             {/* Tab Content */}
@@ -72,7 +86,7 @@ const ModelResponseTabs = ({
                         }
                     </div>
                 )}
-                {activeTab === 'evaluations' && showEvaluations && (judgeResponse !== null) && (
+                {activeTab === 'evaluations' && (judgeResponse !== null) && (
                     <ResponseCards evaluations={judgeResponse.response.evaluations} />
                 )}
             </div>

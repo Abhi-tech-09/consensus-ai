@@ -17,6 +17,8 @@ export default function Home() {
   const [result, setResult] = useState<ModelResponse<JudgeAnswer> | null>(null);
   const [modelResults, setModelResults] = useState<ModelResponse<AIAnswer>[]>([]);
   const [showEvaluations, setShowEvaluations] = useState(false);
+  const [loadingStatus, setLoadingStatus] = useState<
+    'model-loading' | 'judge-loading' | 'done' | 'idle'>('idle');
 
 
   useEffect(() => {
@@ -39,9 +41,7 @@ export default function Home() {
       const result = await reader?.read();
       const value = result?.value;
       if (value === null || value === undefined) { done = true; break; }
-      console.log(decoder.decode(value));
       const res = JSON.parse(decoder.decode(value));
-      console.log(res);
       if ('type' in res.data && res.data.type === 'done') done = true;
       else {
         setModelResults(modelResults => [...modelResults, res.data]);
@@ -64,25 +64,31 @@ export default function Home() {
     setShowEvaluations(false);
     setModelResults([]);
     setResult(null);
+    setLoadingStatus('model-loading');
     const modelResponses = await startStreaming();
+    setLoadingStatus('judge-loading');
     await getJudgeResponse(modelResponses);
     setShowEvaluations(true);
+    setLoadingStatus('done');
+
+
   }
 
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-200">
       <Navbar dark={dark} onToggleDark={() => setDark(d => !d)} />
       <main className="max-w-6xl mx-auto px-4 sm:px-6 pb-24 ">
-        {/* {result === null ? <Hero /> : <ConsensusCard result={{ status: 'done', text: result.response.summary }} />} */}
-        {showEvaluations ? <ConsensusCard judgeResult={result === null ? null : result.response} /> : <Hero />}
+        {showEvaluations ? <ConsensusCard judgeResponse={result === null ? null : result} /> : <Hero />}
         <PromptInput
           prompt={prompt}
           onChange={setPrompt}
           onGenerate={handleOnGenerate}
-          generating={result === null}
+          loadingStatus={loadingStatus}
         />
         {/* <ProgressSection /> */}
-        <ModelResponseTabs modelResponses={modelResults} judgeResponse={result!} showEvaluations={showEvaluations} />
+        <ModelResponseTabs modelResponses={modelResults} judgeResponse={result!} showEvaluations={showEvaluations}
+          loadingStatus={loadingStatus}
+        />
       </main>
     </div>
   );

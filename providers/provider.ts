@@ -5,7 +5,7 @@ import { ZodType } from "zod";
 export abstract class AIProvider {
   protected readonly providerName: PROVIDERS;
   protected readonly modelName: string;
-  protected systemPrompt: string | null = null;
+  private systemPrompt: string | null = null;
   protected responseSchema: Object = {};
   modelStatus: ModelStatus = "idle";
 
@@ -16,6 +16,14 @@ export abstract class AIProvider {
 
   setSystemPrompt(systemPrompt: string): void {
     this.systemPrompt = systemPrompt;
+  }
+
+  appendSystemPrompt(extraSystemPrompt: string): void {
+    this.systemPrompt = this.systemPrompt + "\n" + extraSystemPrompt;
+  }
+
+  getSystemPrompt() {
+    return this.systemPrompt;
   }
 
   getProviderName() {

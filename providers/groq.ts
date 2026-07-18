@@ -13,10 +13,6 @@ export class GroqProvider<T> extends AIProvider {
     });
   }
 
-  setSystemPrompt(systemPrompt: string): void {
-    this.systemPrompt = systemPrompt + " \n " + EXTRA_RULE;
-  }
-
   setSchema(schema: Object) {
     this.responseSchema = {
       response_format: {
@@ -32,12 +28,13 @@ export class GroqProvider<T> extends AIProvider {
 
   async generate<T>(prompt: string): Promise<ModelResponse<T>> {
     const start = performance.now();
+    this.appendSystemPrompt(EXTRA_RULE);
     const response = await this.client.chat.completions.create({
       model: "openai/gpt-oss-20b",
       messages: [
         {
           role: "system",
-          content: this.systemPrompt ?? "",
+          content: this.getSystemPrompt() ?? "",
         },
         {
           role: "user",
@@ -70,4 +67,14 @@ Rules:
 - If a field has no applicable value, return an empty array.
 - Always provide a confidence value.
 - Return only valid JSON.
+
+Additional Instructions:
+
+Be concise and direct.
+
+- Answer the question with minimal unnecessary explanation.
+- Use short, well-structured sentences.
+- Focus on the most important information.
+- Avoid repetition.
+- Do not sacrifice correctness for brevity.
 `;

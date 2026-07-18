@@ -2,10 +2,27 @@ interface PromptInputProps {
     prompt: string
     onChange: (val: string) => void
     onGenerate: (prompt: string) => void
-    generating: boolean
+    loadingStatus: 'model-loading' | 'judge-loading' | 'done' | 'idle'
 }
 
-export default function PromptInput({ prompt, onChange, onGenerate, generating }: PromptInputProps) {
+export default function PromptInput({ prompt, onChange, onGenerate, loadingStatus }: PromptInputProps) {
+
+    const getButtonTxt = () => {
+        switch (loadingStatus) {
+            case 'model-loading': return <span className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                Generating responses…
+            </span>
+            case 'judge-loading': return <span className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                Finalizing synthesis…
+            </span>
+            default: return <span>⌘ + Enter to generate</span>
+        }
+    }
+
+    const generating = !['idle', 'done'].includes(loadingStatus);
+
     return (
         <div className="relative rounded-xl border border-border bg-card shadow-sm overflow-hidden transition-shadow duration-200 focus-within:shadow-md focus-within:border-(--primary)/40 mb-10">
             <textarea
@@ -20,14 +37,7 @@ export default function PromptInput({ prompt, onChange, onGenerate, generating }
             />
             <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-(--secondary)/40">
                 <span className="text-xs text-muted-foreground">
-                    {generating ? (
-                        <span className="flex items-center gap-1.5">
-                            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                            Generating responses…
-                        </span>
-                    ) : (
-                        <span>⌘ + Enter to generate</span>
-                    )}
+                    {getButtonTxt()}
                 </span>
                 <button
                     onClick={() => onGenerate(prompt)}

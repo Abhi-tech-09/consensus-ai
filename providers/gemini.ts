@@ -22,11 +22,12 @@ export class GeminiProvider<T> extends AIProvider {
 
   async generate<T>(prompt: string): Promise<ModelResponse<T>> {
     const start = performance.now();
+    this.appendSystemPrompt(EXTRA_RULE);
     const response = await this.client.models.generateContent({
       model: this.modelName,
       contents: prompt,
       config: {
-        systemInstruction: this.systemPrompt ?? "",
+        systemInstruction: this.getSystemPrompt() ?? "",
         responseMimeType: "application/json",
         ...this.responseSchema,
       },
@@ -46,3 +47,14 @@ export class GeminiProvider<T> extends AIProvider {
     };
   }
 }
+
+const EXTRA_RULE = `
+Additional Instructions:
+
+Focus on teaching through examples.
+
+- Whenever appropriate, include practical or real-world examples.
+- Explain abstract concepts using relatable scenarios.
+- Prefer concrete demonstrations over purely theoretical descriptions.
+- Keep examples relevant and concise.
+`;

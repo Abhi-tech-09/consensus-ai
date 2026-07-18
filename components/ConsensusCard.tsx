@@ -1,8 +1,8 @@
-import { JudgeAnswer } from "@/types/global.types"
+import { JudgeAnswer, ModelResponse } from "@/types/global.types"
 
-export default function ConsensusCard({ judgeResult }: { judgeResult: JudgeAnswer | null }) {
+export default function ConsensusCard({ judgeResponse }: { judgeResponse: ModelResponse<JudgeAnswer> | null }) {
 
-
+    const judgeResult = judgeResponse?.response ?? null;
     return (
         <div className="mt-10 mb-6 rounded-2xl border border-(--primary)/30 bg-linear-to-br from-primary/5 via-background to-(--primary)/3 shadow-lg overflow-hidden transition-all duration-300">
             {/* Header */}
@@ -22,14 +22,7 @@ export default function ConsensusCard({ judgeResult }: { judgeResult: JudgeAnswe
                         </p>
                     </div>
                 </div>
-                {judgeResult === null && (
-                    <div className="flex items-center gap-2">
-                        <span className="flex items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                            High confidence
-                        </span>
-                    </div>
-                )}
+
             </div>
 
             {/* Body */}
@@ -52,21 +45,30 @@ export default function ConsensusCard({ judgeResult }: { judgeResult: JudgeAnswe
 
             {/* Footer badges */}
             {judgeResult !== null && (
-                <div className="px-6 py-5 flex flex-wrap gap-2">
-                    {judgeResult.evaluations.map(evaluation => (
-                        <span
-                            key={evaluation.provider}
-                            className="inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full border border-(--primary)/20 bg-(--primary)/10    text-primary"
-                        >
-                            <svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor">
-                                <circle cx="4" cy="4" r="4" />
-                            </svg>
-                            {evaluation.provider}
+                <div className='flex items-center justify-between gap-2'>
+                    <div className="px-6 py-5 flex flex-wrap gap-2">
+                        {judgeResult.evaluations.map(evaluation => (
+                            <span
+                                key={evaluation.provider}
+                                className="inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full border border-(--primary)/20 bg-(--primary)/10    text-primary"
+                            >
+                                <svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor">
+                                    <circle cx="4" cy="4" r="4" />
+                                </svg>
+                                {evaluation.provider}
+                            </span>
+                        ))}
+                        <span className="text-[11px] text-muted-foreground self-center ml-1">
+                            contributed to this synthesis
                         </span>
-                    ))}
-                    <span className="text-[11px] text-muted-foreground self-center ml-1">
-                        contributed to this synthesis
-                    </span>
+
+
+                    </div>
+                    {judgeResult !== null && (
+                        <div className="px-4 flex-col items-center gap-2">
+                            <p className="text-xs text-muted-foreground tracking-tight">{(judgeResponse?.duration ?? 0 / 1000).toFixed(2)}s</p>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

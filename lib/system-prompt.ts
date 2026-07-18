@@ -11,7 +11,9 @@ export const SYSTEM_PROMPT = `
     - If information is uncertain, indicate the level of certainty.
     - Do not fabricate facts or citations.
     - Keep your explanation concise but sufficiently detailed.
-    - The answer field should contain at most 500 words.
+    - The answer field should contain at most 10-15 sentences.
+    - The answer field should be a valid JSON object matching the provided schema.
+    - Try to answer in points wherever possible.
 `;
 
 export const JUDGE_PROMPT = `
@@ -32,6 +34,8 @@ export const JUDGE_PROMPT = `
     - If one response contains information unsupported by the others, treat it cautiously.
     - Give greater weight to responses that are more accurate, complete, internally consistent, and well reasoned.
     - The final summary should represent the strongest combined answer from all models.
+    - The final summary should be a valid JSON object matching the provided schema.
+    - Try to answer in points wherever possible. The answer should be beautiful, concise and well-structured.
 
     For each model, evaluate:
     - Accuracy
