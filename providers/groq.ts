@@ -2,7 +2,7 @@ import { ModelResponse } from "@/types/global.types";
 import Groq from "groq-sdk";
 import { AIAnswerSchema, PROVIDERS } from "@/lib/constants";
 import { AIProvider } from "./provider";
-import { ZodType } from "zod";
+
 export class GroqProvider<T> extends AIProvider {
   private readonly client: Groq;
 
@@ -11,6 +11,10 @@ export class GroqProvider<T> extends AIProvider {
     this.client = new Groq({
       apiKey: process.env.GROQ_API_KEY,
     });
+  }
+
+  setSystemPrompt(systemPrompt: string): void {
+    this.systemPrompt = systemPrompt + " \n " + EXTRA_RULE;
   }
 
   setSchema(schema: Object) {
@@ -57,7 +61,7 @@ export class GroqProvider<T> extends AIProvider {
   }
 }
 
-const EXTRA_RULE = `
+export const EXTRA_RULE = `
 Your response must satisfy the provided JSON schema.
 
 Rules:

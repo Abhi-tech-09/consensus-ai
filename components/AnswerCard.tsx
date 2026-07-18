@@ -3,6 +3,8 @@
 import { Copy, Check } from 'lucide-react'
 import { useState } from 'react'
 import { AIAnswer, ModelResponse } from '@/types/global.types'
+import { Preahvihear } from 'next/font/google'
+import { PrettifyContent } from './ConsensusCard'
 
 export function AnswerCard({ providerName, modelName, modelResponse }: {
     providerName: string,
@@ -50,7 +52,7 @@ export function AnswerCard({ providerName, modelName, modelResponse }: {
             {/* Answer Content */}
             <div className="relative flex flex-col gap-3 py-2">
                 <div className="prose prose-sm max-w-none px-2  text-sm leading-relaxed text-card-foreground group-hover:text-foreground transition-colors duration-200 overflow-y-scroll max-h-72">
-                    {modelResponse?.response.answer}
+                    <PrettifyContent text={modelResponse?.response.answer ?? ''} />
                 </div>
             </div>
 

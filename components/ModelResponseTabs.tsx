@@ -1,6 +1,6 @@
 import { CONSENSUS_CONFIG } from '@/config/consensus-config';
 import { AIAnswer, JudgeAnswer, ModelResponse } from '@/types/global.types'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { AnswerCard } from './AnswerCard';
 import ResponseCards from './ResponseCards';
 
@@ -20,6 +20,10 @@ const ModelResponseTabs = ({
         return modelResponses.find(modelResponse => modelResponse.model === modelName);
     }
 
+    useEffect(() => {
+        if (showEvaluations) setActiveTab('evaluations');
+    }, [showEvaluations])
+
     return (
         <div className="flex flex-col gap-6">
             {/* Tab Navigation */}
@@ -29,7 +33,7 @@ const ModelResponseTabs = ({
                     className={`px-4 py-3 font-mono text-sm font-medium uppercase tracking-wider transition-all duration-200 relative group ${activeTab === 'answers'
                         ? 'border-b-2 border-foreground text-foreground'
                         : 'text-muted-foreground hover:text-foreground'
-                        }`}
+                        } cursor-pointer`}
                 >
                     Model Answers
                     {activeTab === 'answers' && (
@@ -42,7 +46,7 @@ const ModelResponseTabs = ({
                         className={`px-4 py-3 font-mono text-sm font-medium uppercase tracking-wider transition-all duration-200 relative group animate-slide-in-left ${activeTab === 'evaluations'
                             ? 'border-b-2 border-foreground text-foreground'
                             : 'text-muted-foreground hover:text-foreground'
-                            }`}
+                            } cursor-pointer`}
                     >
                         Evaluations
                         {activeTab === 'evaluations' && (

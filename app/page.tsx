@@ -74,11 +74,12 @@ export default function Home() {
       <Navbar dark={dark} onToggleDark={() => setDark(d => !d)} />
       <main className="max-w-6xl mx-auto px-4 sm:px-6 pb-24 ">
         {/* {result === null ? <Hero /> : <ConsensusCard result={{ status: 'done', text: result.response.summary }} />} */}
+        {showEvaluations ? <ConsensusCard judgeResult={result === null ? null : result.response} /> : <Hero />}
         <PromptInput
           prompt={prompt}
           onChange={setPrompt}
           onGenerate={handleOnGenerate}
-          generating={false}
+          generating={result === null}
         />
         {/* <ProgressSection /> */}
         <ModelResponseTabs modelResponses={modelResults} judgeResponse={result!} showEvaluations={showEvaluations} />
