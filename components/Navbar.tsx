@@ -9,14 +9,8 @@ export default function Navbar({ dark, onToggleDark }: NavbarProps) {
             <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
                 {/* Logo + Title */}
                 <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center shadow-sm">
-                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                            <path
-                                d="M7 1L9.5 5.5H12.5L10 8.5L11 12.5L7 10.5L3 12.5L4 8.5L1.5 5.5H4.5L7 1Z"
-                                fill="white"
-                                strokeWidth="0"
-                            />
-                        </svg>
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center shadow-sm">
+                        <img src="icon.png" alt="Logo" className="w-full h-full object-contain" />
                     </div>
                     <span className="text-sm font-semibold tracking-tight text-foreground">
                         AI Consensus Engine
