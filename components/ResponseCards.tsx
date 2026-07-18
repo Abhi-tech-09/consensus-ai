@@ -1,5 +1,4 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
-import { mock } from "./ConsensusCard"
 import { Check, Plus, Sparkles, X } from "lucide-react"
 import { CONSENSUS_CONFIG, PROVIDER_COLOR } from "@/config/consensus-config"
 import { ConsensusProviderType, EvaluationType } from "@/types/global.types"
