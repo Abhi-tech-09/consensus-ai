@@ -18,9 +18,9 @@ export class AnthropicProvider<T> extends AIProvider {
   setSchema(schema: ZodType) {
     this.responseSchema = {
       output_config: {
-            format: zodOutputFormat(schema),
-          },
-    }
+        format: zodOutputFormat(schema),
+      },
+    };
   }
 
   async generate<T>(prompt: string): Promise<ModelResponse<T> | null> {

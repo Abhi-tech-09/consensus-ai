@@ -1,66 +1,87 @@
 'use client'
 import ConsensusCard from "@/components/ConsensusCard";
 import Hero from "@/components/Hero";
-import { ModelEvaluation, ModelEvaluationCard } from "@/components/ModelEvaluationCard";
 import Navbar from "@/components/Navbar";
 import ProgressSection from "@/components/ProgressSection";
-import ProgressSectionExpected from "@/components/ProgressSectionExpected";
 import PromptInput from "@/components/PromptInput";
-import ResponseCards from "@/components/ResponseCards";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { mock } from "@/components/ConsensusCard";
-import { Orchestrator } from "@/lib/orchestrator";
-import { JudgeAnswer, ModelResponse } from "@/types/global.types";
+import { AIAnswer, JudgeAnswer, ModelResponse } from "@/types/global.types";
+import ModelResponseTabs from "@/components/ModelResponseTabs";
 
 
-type ModelStatus = "idle" | "loading" | "done" | "error";
-
-export interface ModelResult {
-  status: ModelStatus
-  text: string
-}
-
-export interface Results {
-  openai: ModelResult
-  claude: ModelResult
-  gemini: ModelResult
-  consensus: ModelResult
-}
-
-const IDLE: ModelResult = { status: 'idle', text: '' }
 
 export default function Home() {
   const [dark, setDark] = useState(false);
   const [prompt, setPrompt] = useState('');
   const [result, setResult] = useState<ModelResponse<JudgeAnswer> | null>(null);
+  const [modelResults, setModelResults] = useState<ModelResponse<AIAnswer>[]>([]);
+  const [showEvaluations, setShowEvaluations] = useState(false);
 
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', dark)
   }, [dark])
 
-  const handleOnGenerate = async (userPrompt: string) => {
-    const res = await axios.post("/api/v1/chat", {
-      prompt: userPrompt
+  const startStreaming = async () => {
+    const modelResultList: ModelResponse<AIAnswer>[] = [];
+    const response = await fetch('/api/v1/models-response', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ prompt }),
     });
-    setResult(res.data);
+    const reader = response.body?.getReader();
+    const decoder = new TextDecoder();
+    let done = false;
+    while (!done) {
+      const result = await reader?.read();
+      const value = result?.value;
+      if (value === null || value === undefined) { done = true; break; }
+      console.log(decoder.decode(value));
+      const res = JSON.parse(decoder.decode(value));
+      console.log(res);
+      if ('type' in res.data && res.data.type === 'done') done = true;
+      else {
+        setModelResults(modelResults => [...modelResults, res.data]);
+        modelResultList.push(res.data);
+      }
+    }
+    return modelResultList;
+  }
+
+  const getJudgeResponse = async (modelResponses: ModelResponse<AIAnswer>[]) => {
+    const response = await axios.post('/api/v1/judge-response', {
+      prompt,
+      modelResponses
+    });
+    setResult(response.data.data);
+  }
+
+
+  const handleOnGenerate = async (userPrompt: string) => {
+    setShowEvaluations(false);
+    setModelResults([]);
+    setResult(null);
+    const modelResponses = await startStreaming();
+    await getJudgeResponse(modelResponses);
+    setShowEvaluations(true);
   }
 
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-200">
       <Navbar dark={dark} onToggleDark={() => setDark(d => !d)} />
       <main className="max-w-6xl mx-auto px-4 sm:px-6 pb-24 ">
-        {result === null ? <Hero /> : <ConsensusCard result={{ status: 'done', text: result.response.summary }} />}
+        {/* {result === null ? <Hero /> : <ConsensusCard result={{ status: 'done', text: result.response.summary }} />} */}
         <PromptInput
           prompt={prompt}
           onChange={setPrompt}
           onGenerate={handleOnGenerate}
           generating={false}
         />
-        <ProgressSection />
-        {result !== null && <ResponseCards evaluations={result.response.evaluations} />}
-
+        {/* <ProgressSection /> */}
+        <ModelResponseTabs modelResponses={modelResults} judgeResponse={result!} showEvaluations={showEvaluations} />
       </main>
     </div>
   );

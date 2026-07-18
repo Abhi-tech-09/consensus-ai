@@ -16,7 +16,7 @@ export const CONSENSUS_CONFIG: ConsensusConfigType = {
   providers: [
     {
       name: PROVIDERS.OpenAI,
-      model: "gpt-5-mini",
+      model: "gpt-5.4-nano",
       color: "#10a37f",
       getProvider() {
         return new OpenAIProvider(this.name, this.model);
@@ -32,7 +32,7 @@ export const CONSENSUS_CONFIG: ConsensusConfigType = {
     },
     {
       name: PROVIDERS.Gemini,
-      model: "gemini-3.5-flash",
+      model: "gemini-3.1-flash-lite",
       color: "#4285f4",
       getProvider() {
         return new GeminiProvider(this.name, this.model);

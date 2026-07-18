@@ -44,7 +44,11 @@ export abstract class AIProvider {
       return res;
     } catch (error: any) {
       this.modelStatus = "error";
-      console.log(this.modelName, " failed while processing the prompt with error", ('message' in error ? error.message :''));
+      console.log(
+        this.modelName,
+        " failed while processing the prompt with error",
+        "message" in error ? error.message : "",
+      );
       throw new Error("Failed while invoking " + this.modelName + " " + error);
     }
   }

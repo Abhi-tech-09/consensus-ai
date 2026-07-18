@@ -16,8 +16,8 @@ export class GeminiProvider<T> extends AIProvider {
 
   setSchema(schema: Object) {
     this.responseSchema = {
-      responseSchema: schema
-    }
+      responseSchema: schema,
+    };
   }
 
   async generate<T>(prompt: string): Promise<ModelResponse<T>> {
@@ -33,7 +33,7 @@ export class GeminiProvider<T> extends AIProvider {
     });
 
     const duration = performance.now() - start;
-    console.log(response.text);
+    // console.log(response.text);
     const parsedResponse = AIAnswerSchema.parse(
       JSON.parse(response.text ?? "{}"),
     );
